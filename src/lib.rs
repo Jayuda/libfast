@@ -24,9 +24,33 @@ fn read_fastq(filename: &str) -> PyResult<(Vec<String>, Vec<String>)> {
     Ok((sequences, qualities)).into()
 }
 
+#[pyfunction]
+fn read_fasta(filename: &str) -> PyResult<String> {
+    let file = File::open(filename).expect("Unable to open file");
+    let mut reader = BufReader::new(file);
+    let mut seq = String::new();
+    let mut line = String::new();
+
+    // Skip name line / info line
+    reader.read_line(&mut line)?;
+
+    // Read data
+    while reader.read_line(&mut line)? > 0 {
+        seq.push_str(line.trim());
+        line.clear();
+    }
+
+    // Remove special characters
+    seq.retain(|c| !c.is_ascii_whitespace());
+
+    Ok(seq)
+}
+
+
 /// A Python module implemented in Rust.
 #[pymodule]
-fn libfastq(_py: Python, m: &PyModule) -> PyResult<()> {
+fn libfast(_py: Python, m: &PyModule) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(read_fastq, m)?)?;
+    m.add_function(wrap_pyfunction!(read_fasta, m)?)?;
     Ok(())
 }
