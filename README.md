@@ -1,6 +1,6 @@
-# libfastq
+# libfast
 
 ``` python
-import libfastq
-seqs, quals = libfastq.read_fastq(sFile)
+import libfast
+seqs, quals = libfast.read_fastq(sFile)
 ```
